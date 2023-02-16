@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -42,9 +43,15 @@ public class Main {
         circ.ConnectElement(0, 3, R2);
         circ.ConnectElement(3, 4, R4);
 
+        double[] I = circ.I(0, 4, 10);
+        double[] U = circ.U(0, 4, 10);
+        System.out.println(Arrays.toString(U));
+
         double r = circ.R(0, 4);
         System.out.print("R = ");
         System.out.println(r);
+
+        circ.Simulate(0, 4, 10);
     }
 
     public static void Gauss() {

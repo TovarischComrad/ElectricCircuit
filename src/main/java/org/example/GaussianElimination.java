@@ -1,5 +1,6 @@
 package org.example;
 
+// TODO - обработать код под себя
 public class GaussianElimination {
     public double[] solve(double[][] A, double[] B)
     {

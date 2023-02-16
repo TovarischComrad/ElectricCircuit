@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -61,8 +62,14 @@ public class Circuit {
         return res;
     }
 
-    // Расчёт сопротивления схемы
     public double R(int start, int end) {
+        double[] res = I(start, end, 1.0);
+        return -res[E];
+    }
+
+    // Расчёт силы тока на каждом из участков цепи
+    // Исходя из общей силы тока
+    public double[] I(int start, int end, double I) {
 
         // Подготовка данных
         int N = V + E;
@@ -78,12 +85,12 @@ public class Circuit {
         // Заполнение матрицы коэффициентов и свободных членов
         // Часть системы с уравнениями силы тока
         for (int i = 0; i < V; i++) {
-            if (i == start) { B[i] = -1; }
+            if (i == start) { B[i] = -I; }
             else {
                 LinkedList<Integer> to = this.To(i);
                 for (Integer j : to) { A[i][j] = 1; }
             }
-            if (i == end) { B[i] = 1; }
+            if (i == end) { B[i] = I; }
             else {
                 LinkedList<Integer> from = this.From(i);
                 for (Integer j : from) { A[i][j] = -1; }
@@ -106,8 +113,37 @@ public class Circuit {
         }
 
         GaussianElimination ge = new GaussianElimination();
-        double[] res = ge.solve(A,B);
+        return ge.solve(A,B);
+    }
 
-        return -res[E];
+    // Расчёт силы тока на каждом из участков цепи
+    // Исходя из разности потенциалов
+    public double[] U(int start, int end, double emf) {
+        double R = R(start, end);
+        double I = emf / R;
+        return this.I(start, end, I);
+    }
+
+    public void Simulate(int start, int end, double emf) {
+        double[] I = U(start, end, emf);
+        double[] res = new double[E]; // 0 - норма, -1 - недостаток, 1 - избыток
+
+        int k = 0;
+        for (int i = 0; i < V; i++) {
+            LinkedList<Edge> edges = AdjList.get(i);
+            for (Edge edge : edges) {
+                int n = edge.Id;
+                if (I[n] < edge.electricElement.I - edge.electricElement.eps) {
+                    res[n] = -1;
+                }
+                else if (I[n] > edge.electricElement.I + edge.electricElement.eps) {
+                    res[n] = 1;
+                }
+                else { res[n] = 0; }
+                k++;
+            }
+        }
+
+        System.out.println(Arrays.toString(res));
     }
 }
