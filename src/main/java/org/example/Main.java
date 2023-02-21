@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -54,6 +56,23 @@ public class Main {
         circ.Simulate(0, 4, 10);
     }
 
+    public static void CircTest3() throws IOException {
+        // Circuit circ = new Circuit("src/main/resources/input.txt");
+        Circuit circ = new Circuit("output.txt");
+
+        double[] I = circ.I(0, 4, 10);
+        double[] U = circ.U(0, 4, 10);
+        System.out.println(Arrays.toString(U));
+
+        double r = circ.R(0, 4);
+        System.out.print("R = ");
+        System.out.println(r);
+
+        circ.Simulate(0, 4, 10);
+
+        circ.SaveCircuit("output.txt");
+    }
+
     public static void Gauss() {
         Scanner scan = new Scanner(System.in);
         System.out.println("Gaussian Elimination Algorithm Test\n");
@@ -79,7 +98,7 @@ public class Main {
     }
 
 
-    public static void main(String[] args) {
-        CircTest2();
+    public static void main(String[] args) throws IOException {
+        CircTest3();
     }
 }

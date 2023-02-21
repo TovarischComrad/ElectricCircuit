@@ -1,8 +1,12 @@
 package org.example;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
+import javafx.util.Pair;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 
 // TODO - разобраться с int и Integer
@@ -22,6 +26,59 @@ public class Circuit {
         E = 0;
         VertexList = new LinkedList<>();
         AdjList = new HashMap<>();
+    }
+
+    // TODO - возможно добавить тип элемента (лампочка, резистор, реостат, ...)
+    // Считывание схемы из файла
+    public Circuit(String filePath) throws IOException {
+        V = 0;
+        E = 0;
+        VertexList = new LinkedList<>();
+        AdjList = new HashMap<>();
+
+        FileReader reader = new FileReader(filePath);
+        Scanner scanner = new Scanner(reader);
+
+        Integer n = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < n; i++) {
+            this.AddElement();
+        }
+
+        for (int i = 0; i < V; i++) {
+            String[] s = scanner.nextLine().split(" ");
+            Integer first = Integer.parseInt(s[0]);
+            Integer second = Integer.parseInt(s[1]);
+            double R = Double.parseDouble(s[2]);
+            ElectricElement el = new ElectricElement(R);
+            this.ConnectElement(first, second, el);
+        }
+
+        reader.close();
+    }
+
+    public void SaveCircuit(String filePath) throws IOException {
+        FileWriter writer = new FileWriter(filePath);
+        writer.write(String.valueOf(V));
+        writer.write("\n");
+
+        LinkedList<Pair<Integer, Edge>> lst = new LinkedList<>();
+
+        for (int i = 0; i < V; i++) {
+            LinkedList<Edge> e = AdjList.get(i);
+            for (Edge edge : e) {
+                lst.add(new Pair<>(i, edge));
+            }
+        }
+
+        Collections.sort(lst, Comparator.comparingInt(l -> l.getValue().Id));
+        for (int i = 0; i < E; i++) {
+            String first = lst.get(i).getKey().toString();
+            String second = String.valueOf(lst.get(i).getValue().elementId);
+            String R = String.valueOf(lst.get(i).getValue().electricElement.R);
+            writer.write(first + " " + second + " " + R + "\n");
+        }
+        writer.close();
+
     }
 
     public void AddElement() {
