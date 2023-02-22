@@ -1,159 +1,68 @@
 package org.example;
 
-import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Scanner;
 
+import java.awt.*;
+import java.io.IOException;
+import java.util.LinkedList;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.scene.Group;
-import javafx.scene.text.Text;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.event.ActionEvent;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.stage.Stage;
-
 
 public class Main extends Application {
-    public static void CircTest() {
-        Circuit circ = new Circuit();
-        for (int i = 0; i < 4; i++) {
-            circ.AddElement();
-        }
-        ElectricElement R1 = new ElectricElement(1);
-        ElectricElement R2 = new ElectricElement(2);
-        ElectricElement R3 = new ElectricElement(3);
-        ElectricElement R4 = new ElectricElement(4);
-        ElectricElement R5 = new ElectricElement(5);
-
-        circ.ConnectElement(0, 1, R1);
-        circ.ConnectElement(0, 2, R2);
-        circ.ConnectElement(1, 2, R3);
-        circ.ConnectElement(1, 3, R4);
-        circ.ConnectElement(2, 3, R5);
-
-        double r = circ.R(0, 1);
-        System.out.print("R = ");
-        System.out.println(r);
-    }
-
-    public static void CircTest2() {
-        Circuit circ = new Circuit();
-        for (int i = 0; i < 5; i++) {
-            circ.AddElement();
-        }
-        ElectricElement R1 = new ElectricElement(1);
-        ElectricElement R2 = new ElectricElement(2);
-        ElectricElement R3 = new ElectricElement(3);
-        ElectricElement R4 = new ElectricElement(4);
-        ElectricElement R5 = new ElectricElement(5);
-
-        circ.ConnectElement(0, 1, R1);
-        circ.ConnectElement(1, 2, R3);
-        circ.ConnectElement(2, 4, R5);
-        circ.ConnectElement(0, 3, R2);
-        circ.ConnectElement(3, 4, R4);
-
-        double[] I = circ.I(0, 4, 10);
-        double[] U = circ.U(0, 4, 10);
-        System.out.println(Arrays.toString(U));
-
-        double r = circ.R(0, 4);
-        System.out.print("R = ");
-        System.out.println(r);
-
-        circ.Simulate(0, 4, 10);
-    }
-
-    public static void CircTest3() throws IOException {
-        // Circuit circ = new Circuit("src/main/resources/input.txt");
-        Circuit circ = new Circuit("output.txt");
-
-        double[] I = circ.I(0, 4, 10);
-        double[] U = circ.U(0, 4, 10);
-        System.out.println(Arrays.toString(U));
-
-        double r = circ.R(0, 4);
-        System.out.print("R = ");
-        System.out.println(r);
-
-        circ.Simulate(0, 4, 10);
-
-        circ.SaveCircuit("output.txt");
-    }
-
-    public static void Gauss() {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Gaussian Elimination Algorithm Test\n");
-        /** Make an object of GaussianElimination class **/
-        GaussianElimination ge = new GaussianElimination();
-
-        System.out.println("\nEnter number of variables");
-        int N = scan.nextInt();
-
-        double[] B = new double[N];
-        double[][] A = new double[N][N];
-
-        System.out.println("\nEnter "+ N +" equations coefficients ");
-        for (int i = 0; i < N; i++)
-            for (int j = 0; j < N; j++)
-                A[i][j] = scan.nextDouble();
-
-        System.out.println("\nEnter "+ N +" solutions");
-        for (int i = 0; i < N; i++)
-            B[i] = scan.nextDouble();
-
-        ge.solve(A,B);
-    }
-
-
+    Circuit circuit;
     int width = 800;
     int height = 600;
     int margin = 50;
-    int cx = (int) (width / 2.0);
     int cy = (int) (height / 2.0);
 
-    public static void main(String[] args) throws IOException {
-        launch(args);
-    }
-
-    private void drawShapes(GraphicsContext gc) {
-        gc.setStroke(Color.RED);
-        gc.strokeRoundRect(10, 10, 230, 230, 10, 10);
-    }
-
-    public static class MouseGestures {
-
+    // Вспомогательный класс для реализации перемещения объекта
+    public static class Mouse {
+        static Pane pane;
         double orgSceneX, orgSceneY;
         double orgTranslateX, orgTranslateY;
 
         public void makeDraggable(Node node) {
             node.setOnMousePressed(circleOnMousePressedEventHandler);
             node.setOnMouseDragged(circleOnMouseDraggedEventHandler);
+        }
+
+        public void MoveLine(MouseEvent t, Circle c) {
+            String c_id = c.getId();
+            ObservableList<Node> nodes = pane.getChildren();
+            for (int i = 0; i < nodes.size(); i++) {
+                if (nodes.get(i) instanceof Line) {
+                    Line line = (Line) pane.getChildren().get(i);
+                    String l_id = line.getId();
+                    String[] ids = l_id.split(" ");
+                    if (c_id.equals(ids[1])) {
+                        line.setStartX(t.getSceneX());
+                        line.setStartY(t.getSceneY());
+                    } else if (c_id.equals(ids[2])) {
+                        line.setEndX(t.getSceneX());
+                        line.setEndY(t.getSceneY());
+                    }
+                }
+            }
         }
 
         EventHandler<MouseEvent> circleOnMousePressedEventHandler = new EventHandler<MouseEvent>() {
@@ -166,6 +75,13 @@ public class Main extends Application {
                     orgTranslateX = p.getCenterX();
                     orgTranslateY = p.getCenterY();
 
+                    // доп действие
+                    if (p.getFill() == Color.GREEN) {
+                        p.setFill(Color.RED);
+                    }
+                    else {
+                        p.setFill(Color.GREEN);
+                    }
                 } else {
                     Node p = ((Node) (t.getSource()));
                     orgTranslateX = p.getTranslateX();
@@ -185,7 +101,7 @@ public class Main extends Application {
                     Circle p = ((Circle) (t.getSource()));
                     p.setCenterX(newTranslateX);
                     p.setCenterY(newTranslateY);
-
+                    MoveLine(t, p);
                 } else {
                     Node p = ((Node) (t.getSource()));
                     p.setTranslateX(newTranslateX);
@@ -195,11 +111,9 @@ public class Main extends Application {
         };
     }
 
-
-    public Circle drawCircle(int i, Circuit circ) {
-        Circle circle = new Circle(10);
-        circle.setStroke(Color.GREEN);
-        circle.setFill(Color.GREEN);
+    // Расчёт положения узла
+    public void Location(Circle circle, int i, Circuit circ) {
+        // Расчёт положения вершин
         if (i == 0) {
             circle.relocate(margin, height / 2.0);
         }
@@ -207,47 +121,79 @@ public class Main extends Application {
             circle.relocate(width - margin, height / 2.0);
         }
         else {
-            int ay = cy - margin * 2;
-            int by = cy + margin * 2;
-            int ax = cx - margin * 5;
-            int bx = cx + margin * 5;
-            int x = (int) (Math.random() * (bx - ax) + ax);
+            int k = (width - 2 * margin) / (circ.V - 1);
+            int ay = cy - margin * 4;
+            int by = cy + margin * 4;
+            int x = margin + k * i;
             int y = (int) (Math.random() * (by - ay) + ay);
             circle.relocate(x, y);
         }
-        circle.setOnMousePressed(event -> {
-            if (circle.getFill() == Color.GREEN) {
-                circle.setFill(Color.RED);
-            }
-            else {
-                circle.setFill(Color.GREEN);
-            }
-        });
+    }
+
+    // Инициализация круга, расчёт положения и назначение действия при нажатии
+    public Circle drawCircle(int i, Circuit circ) {
+        Circle circle = new Circle(10);
+        circle.setStroke(Color.GREEN);
+        circle.setFill(Color.GREEN);
+        Location(circle, i, circ);
+        Mouse mg = new Mouse();
+        mg.makeDraggable(circle);
         return circle;
     }
-    public void my_test(Stage stage) throws IOException {
 
+    // Заполнение сцены
+    @Override
+    public void start(Stage stage) throws IOException {
+        // Электрическая схема
+        circuit = new Circuit("output.txt");
 
-        Group root = new Group();
-        Circuit circ = new Circuit("output.txt");
+        // Инициализация узлов
         LinkedList<Circle> circles = new LinkedList<>();
-        for (int i = 0; i < circ.V; i++) {
-            Circle circle = drawCircle(i, circ);
+        for (int i = 0; i < circuit.V; i++) {
+            Circle circle = drawCircle(i, circuit);
+            circle.setId(String.valueOf(i));
             circles.add(circle);
         }
 
+        // Инициализация элементов (рёбер)
+        LinkedList<Line> lines = new LinkedList<>();
+        for (int i = 0; i < circuit.V; i++) {
+            LinkedList<Edge> edges = circuit.AdjList.get(i);
+            for (Edge e : edges) {
+                Line line = new Line();
+                String id = "l " + i + " " + e.elementId;
+                line.setId(id);
+                line.setStartX(circles.get(i).getLayoutX());
+                line.setStartY(circles.get(i).getLayoutY());
+                line.setEndX(circles.get(e.elementId).getLayoutX());
+                line.setEndY(circles.get(e.elementId).getLayoutY());
+                lines.add(line);
+            }
+        }
+
+
+        FlowPane flowPane = new FlowPane();
+        Label lbl = new Label("Здесь будет сопротивление");
+        Button btn = new Button("R");
+        btn.setPrefWidth(80);
+        btn.setOnAction(event -> {
+            double R = circuit.R(0, circuit.V - 1);
+            lbl.setText(String.valueOf(R));
+        });
+        flowPane.getChildren().addAll(btn, lbl);
 
         Pane overlay = new Pane();
+        overlay.getChildren().addAll(lines);
         overlay.getChildren().addAll(circles);
+        Mouse.pane = overlay;
 
-        root.getChildren().addAll(overlay);
-
+        Group root = new Group();
+        root.getChildren().addAll(overlay, flowPane);
         stage.setScene(new Scene(root, width, height));
         stage.show();
     }
 
-    @Override
-    public void start(Stage stage) throws IOException {
-        my_test(stage);
+    public static void main(String[] args) {
+        launch(args);
     }
 }

@@ -7,23 +7,23 @@ public class GaussianElimination {
         int N = B.length;
         for (int k = 0; k < N; k++)
         {
-            /** find pivot row **/
+            /* find pivot row **/
             int max = k;
             for (int i = k + 1; i < N; i++)
                 if (Math.abs(A[i][k]) > Math.abs(A[max][k]))
                     max = i;
 
-            /** swap row in A matrix **/
+            /* swap row in A matrix **/
             double[] temp = A[k];
             A[k] = A[max];
             A[max] = temp;
 
-            /** swap corresponding values in constants matrix **/
+            /* swap corresponding values in constants matrix **/
             double t = B[k];
             B[k] = B[max];
             B[max] = t;
 
-            /** pivot within A and B **/
+            /* pivot within A and B **/
             for (int i = k + 1; i < N; i++)
             {
                 double factor = A[i][k] / A[k][k];
@@ -33,10 +33,10 @@ public class GaussianElimination {
             }
         }
 
-        /** Print row echelon form **/
+        /* Print row echelon form **/
         // printRowEchelonForm(A, B);
 
-        /** back substitution **/
+        /* back substitution **/
         double[] solution = new double[N];
         for (int i = N - 1; i >= 0; i--)
         {
@@ -53,7 +53,7 @@ public class GaussianElimination {
 
         return solution;
 
-        /** Print solution **/
+        /* Print solution **/
         // printSolution(solution);
     }
     /** function to print in row    echleon form **/
@@ -74,8 +74,7 @@ public class GaussianElimination {
     {
         int N = sol.length;
         System.out.println("\nSolution : ");
-        for (int i = 0; i < N; i++)
-            System.out.printf("%.3f ", sol[i]);
+        for (double v : sol) System.out.printf("%.3f ", v);
         System.out.println();
     }
 }

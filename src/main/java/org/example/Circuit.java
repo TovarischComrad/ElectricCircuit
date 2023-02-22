@@ -1,8 +1,6 @@
 package org.example;
 
 import javafx.util.Pair;
-
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,24 +33,20 @@ public class Circuit {
         E = 0;
         VertexList = new LinkedList<>();
         AdjList = new HashMap<>();
-
         FileReader reader = new FileReader(filePath);
         Scanner scanner = new Scanner(reader);
-
-        Integer n = Integer.parseInt(scanner.nextLine());
+        int n = Integer.parseInt(scanner.nextLine());
         for (int i = 0; i < n; i++) {
             this.AddElement();
         }
-
         for (int i = 0; i < V; i++) {
             String[] s = scanner.nextLine().split(" ");
-            Integer first = Integer.parseInt(s[0]);
-            Integer second = Integer.parseInt(s[1]);
+            int first = Integer.parseInt(s[0]);
+            int second = Integer.parseInt(s[1]);
             double R = Double.parseDouble(s[2]);
             ElectricElement el = new ElectricElement(R);
             this.ConnectElement(first, second, el);
         }
-
         reader.close();
     }
 
@@ -70,7 +64,7 @@ public class Circuit {
             }
         }
 
-        Collections.sort(lst, Comparator.comparingInt(l -> l.getValue().Id));
+        lst.sort(Comparator.comparingInt(l -> l.getValue().Id));
         for (int i = 0; i < E; i++) {
             String first = lst.get(i).getKey().toString();
             String second = String.valueOf(lst.get(i).getValue().elementId);
@@ -88,7 +82,7 @@ public class Circuit {
         MaxId++;
     }
 
-    public void ConnectElement(Integer el1, Integer el2, ElectricElement el) {
+    public void ConnectElement(int el1, int el2, ElectricElement el) {
         E++;
         Edge e = new Edge(el, el2);
         AdjList.get(el1).add(e);
@@ -185,7 +179,6 @@ public class Circuit {
         double[] I = U(start, end, emf);
         double[] res = new double[E]; // 0 - норма, -1 - недостаток, 1 - избыток
 
-        int k = 0;
         for (int i = 0; i < V; i++) {
             LinkedList<Edge> edges = AdjList.get(i);
             for (Edge edge : edges) {
@@ -197,7 +190,6 @@ public class Circuit {
                     res[n] = 1;
                 }
                 else { res[n] = 0; }
-                k++;
             }
         }
 
