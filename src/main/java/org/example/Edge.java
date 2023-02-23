@@ -9,14 +9,6 @@ public class Edge {
     double w;
     int elementId; // узел, куда направлена дуга
 
-    public Edge(int elementId) {
-        this.elementId = elementId;
-        Id = MaxId;
-        MaxId++;
-        electricElement = new ElectricElement();
-        w = 0;
-    }
-
     public Edge(ElectricElement el, int elementId) {
         this.elementId = elementId;
         Id = MaxId;

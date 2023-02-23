@@ -56,7 +56,7 @@ public class Test {
 
     public static void CircTest3() throws IOException {
         // Circuit circ = new Circuit("src/main/resources/input.txt");
-        Circuit circ = new Circuit("output.txt");
+        Circuit circ = new Circuit("input.txt");
 
         double[] I = circ.I(0, 4, 10);
         double[] U = circ.U(0, 4, 10);
@@ -68,6 +68,6 @@ public class Test {
 
         circ.Simulate(0, 4, 10);
 
-        circ.SaveCircuit("output.txt");
+        circ.SaveCircuit("input.txt");
     }
 }
