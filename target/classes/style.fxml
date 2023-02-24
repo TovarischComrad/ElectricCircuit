@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.Scene?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.Group?>
-<Scene xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
-    <Group id="main">
-        <Pane prefWidth="800" prefHeight="600">
-            <Button text="Open" layoutX="50" layoutY="25" onAction="#Open"/>
+<Scene xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
+    <AnchorPane id="main" prefHeight="600.0" prefWidth="800.0">
+        <Pane id="control" layoutX="40.0" layoutY="32.0" prefHeight="100.0" prefWidth="720.0">
+            <Button layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onAction="#Open" prefWidth="80.0" text="Open" />
+            <Button layoutX="122.0" layoutY="14.0" mnemonicParsing="false" onAction="#Save" prefWidth="80.0" text="Save" />
+         <Button layoutX="219.0" layoutY="14.0" mnemonicParsing="false" onAction="#Clear" prefWidth="80.0" text="Clear" />
         </Pane>
-    </Group>
+        <Pane id="overlay" layoutX="40.0" layoutY="149.0" prefHeight="400.0" prefWidth="720.0" />
+    </AnchorPane>
 </Scene>

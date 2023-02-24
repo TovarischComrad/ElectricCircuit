@@ -2,6 +2,7 @@ package org.example;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -21,8 +22,8 @@ import java.util.LinkedList;
 
 public class Controller {
     Circuit circuit;
-    int width = 800;
-    int height = 600;
+    int width;
+    int height;
     int margin = 50;
     int cy = (int) (height / 2.0);
 
@@ -37,7 +38,7 @@ public class Controller {
             node.setOnMouseDragged(circleOnMouseDraggedEventHandler);
         }
 
-        public void MoveLine(MouseEvent t, Circle c) {
+        public void MoveLine(MouseEvent t, Circle c, int x, int y) {
             String c_id = c.getId();
             ObservableList<Node> nodes = pane.getChildren();
             for (int i = 0; i < nodes.size(); i++) {
@@ -46,11 +47,11 @@ public class Controller {
                     String l_id = line.getId();
                     String[] ids = l_id.split(" ");
                     if (c_id.equals(ids[1])) {
-                        line.setStartX(t.getSceneX());
-                        line.setStartY(t.getSceneY());
+                        line.setStartX(t.getSceneX() - x);
+                        line.setStartY(t.getSceneY() - y);
                     } else if (c_id.equals(ids[2])) {
-                        line.setEndX(t.getSceneX());
-                        line.setEndY(t.getSceneY());
+                        line.setEndX(t.getSceneX() - x);
+                        line.setEndY(t.getSceneY() - y);
                     }
                 }
             }
@@ -84,7 +85,7 @@ public class Controller {
                     Circle p = ((Circle) (t.getSource()));
                     p.setCenterX(newTranslateX);
                     p.setCenterY(newTranslateY);
-                    MoveLine(t, p);
+                    MoveLine(t, p, (int) pane.getLayoutX(), (int) pane.getLayoutY());
                 } else {
                     Node p = ((Node) (t.getSource()));
                     p.setTranslateX(newTranslateX);
@@ -95,7 +96,13 @@ public class Controller {
     }
 
     // Расчёт положения узла
-    public void Location(Circle circle, int i, Circuit circ) {
+    public void Location(Circle circle, int i, Circuit circ, Event event) {
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        Pane overlay = (Pane) scene.lookup("#overlay");
+        int dx = (int) overlay.getLayoutX();
+        int dy = (int) overlay.getLayoutY();
+
         // Расчёт положения вершин
         if (i == 0) {
             circle.relocate(margin, height / 2.0);
@@ -109,26 +116,29 @@ public class Controller {
             int by = cy + margin * 4;
             int x = margin + k * i;
             int y = (int) (Math.random() * (by - ay) + ay);
-            circle.relocate(x, y);
+            circle.relocate(dx + x, dy + y);
         }
     }
 
     // Инициализация круга, расчёт положения и назначение действия при нажатии
-    public Circle drawCircle(int i, Circuit circ) {
+    public Circle drawCircle(int i, Circuit circ, Event event) {
         Circle circle = new Circle(5);
         circle.setStroke(Color.BLACK);
         circle.setFill(Color.BLACK);
-        Location(circle, i, circ);
+        Location(circle, i, circ, event);
         Mouse mg = new Mouse();
         mg.makeDraggable(circle);
         return circle;
     }
 
-    public Pane DrawCircuit(Circuit circuit) {
+    public void DrawCircuit(Circuit circuit, Pane overlay, Event event) {
+        width = (int) overlay.getWidth();
+        height = (int) overlay.getHeight();
+
         // Инициализация узлов
         LinkedList<Circle> circles = new LinkedList<>();
         for (int i = 0; i < circuit.V; i++) {
-            Circle circle = drawCircle(i, circuit);
+            Circle circle = drawCircle(i, circuit, event);
             circle.setId(String.valueOf(i));
             circles.add(circle);
         }
@@ -148,11 +158,9 @@ public class Controller {
                 lines.add(line);
             }
         }
-        Pane overlay = new Pane();
         overlay.getChildren().addAll(lines);
         overlay.getChildren().addAll(circles);
         Mouse.pane = overlay;
-        return overlay;
     }
 
     @FXML
@@ -161,14 +169,35 @@ public class Controller {
         Stage stage = (Stage) node.getScene().getWindow();
         Scene scene = node.getScene();
 
+        Clear(event);
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("..\\ElectricCircuit"));
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             circuit = new Circuit(file.getName());
-            Pane overlay = DrawCircuit(circuit);
-            Group root = (Group) scene.lookup("#main");
-            root.getChildren().addAll(overlay);
+            Pane overlay = (Pane) scene.lookup("#overlay");
+            DrawCircuit(circuit, overlay, event);
         }
+    }
+
+    @FXML
+    private void Save(ActionEvent event) throws IOException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("..\\ElectricCircuit"));
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            circuit.SaveCircuit(file.getName());
+        }
+    }
+
+    @FXML
+    private void Clear(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        Pane overlay = (Pane) scene.lookup("#overlay");
+        overlay.getChildren().clear();
     }
 }

@@ -20,6 +20,7 @@ public class Circuit {
     int E;
 
     public Circuit() {
+        MaxId = 0;
         V = 0;
         E = 0;
         VertexList = new LinkedList<>();
@@ -29,6 +30,7 @@ public class Circuit {
     // TODO - возможно добавить тип элемента (лампочка, резистор, реостат, ...)
     // Считывание схемы из файла
     public Circuit(String filePath) throws IOException {
+        MaxId = 0;
         V = 0;
         E = 0;
         VertexList = new LinkedList<>();
