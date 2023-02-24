@@ -3,14 +3,39 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <Scene xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
-    <AnchorPane id="main" prefHeight="600.0" prefWidth="800.0">
-        <Pane id="control" layoutX="40.0" layoutY="32.0" prefHeight="100.0" prefWidth="720.0">
+    <AnchorPane id="main" prefHeight="700.0" prefWidth="800.0">
+        <Pane id="control" layoutX="40.0" layoutY="32.0" prefHeight="206.0" prefWidth="720.0">
             <Button layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onAction="#Open" prefWidth="80.0" text="Open" />
             <Button layoutX="122.0" layoutY="14.0" mnemonicParsing="false" onAction="#Save" prefWidth="80.0" text="Save" />
          <Button layoutX="219.0" layoutY="14.0" mnemonicParsing="false" onAction="#Clear" prefWidth="80.0" text="Clear" />
+         <Button layoutX="25.0" layoutY="50.0" mnemonicParsing="false" onAction="#R" text="R">
+            <font>
+               <Font size="16.0" />
+            </font>
+         </Button>
+         <Label fx:id="om" layoutX="65.0" layoutY="57.0" text="= ... Ом">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <TextField fx:id="volt" layoutX="275.0" layoutY="55.0" prefHeight="25.0" prefWidth="45.0" text="0" />
+         <Button layoutX="135.0" layoutY="55.0" mnemonicParsing="false" onAction="#U" prefHeight="25.0" prefWidth="130.0" text="Подать напряжение" />
+         <Label layoutX="326.0" layoutY="57.0" text="В">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <Label fx:id="ampere" layoutX="360.0" layoutY="57.0" text="I = ... А">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <Button layoutX="313.0" layoutY="14.0" mnemonicParsing="false" onAction="#Simulate" prefHeight="25.0" prefWidth="95.0" text="Запустить" />
+         <ListView fx:id="log" layoutX="453.0" layoutY="14.0" prefHeight="176.0" prefWidth="247.0" />
         </Pane>
-        <Pane id="overlay" layoutX="40.0" layoutY="149.0" prefHeight="400.0" prefWidth="720.0" />
+        <Pane id="overlay" layoutX="47.0" layoutY="241.0" prefHeight="415.0" prefWidth="706.0" />
     </AnchorPane>
 </Scene>

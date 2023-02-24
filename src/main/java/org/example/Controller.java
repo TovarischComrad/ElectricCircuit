@@ -1,13 +1,14 @@
 package org.example;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -15,6 +16,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -164,6 +168,15 @@ public class Controller {
     }
 
     @FXML
+    private Label om;
+    @FXML
+    public Label ampere;
+    @FXML
+    public TextField volt;
+    @FXML
+    public ListView<String> log;
+
+    @FXML
     private void Open(ActionEvent event) throws IOException {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
@@ -199,5 +212,53 @@ public class Controller {
         Scene scene = node.getScene();
         Pane overlay = (Pane) scene.lookup("#overlay");
         overlay.getChildren().clear();
+
+        om.setText("= ... Ом");
+        ampere.setText("I = ... А");
+        volt.setText("0");
+        log.getItems().clear();
+        circuit = null;
+    }
+
+    @FXML
+    private void R() {
+        if (circuit != null) {
+            double r = circuit.R(0, circuit.V - 1);
+            String s = "= " + r + " Ом";
+            om.setText(s);
+        }
+    }
+
+    @FXML
+    private void U() {
+        if (circuit != null) {
+            double u = Double.parseDouble(volt.getText());
+            double r = circuit.R(0, circuit.V - 1);
+            double i = u / r;
+            String num = String.format( "%.2f", i);
+            String s = "I = " + num + " А";
+            ampere.setText(s);
+        }
+    }
+
+    @FXML
+    private void Simulate() {
+        double u = Double.parseDouble(volt.getText());
+        double[] res = circuit.Simulate(0, circuit.V - 1, u);
+        ObservableList<String> logs = FXCollections.observableArrayList();
+        for (int i = 0; i < res.length; i++) {
+            String s = "";
+            if (res[i] == 0) {
+                s = "Устройство " + i + " функционирует нормально";
+            }
+            else if (res[i] == 1) {
+                s = "Устройство " + i + " перегорело";
+            }
+            else if (res[i] == -1) {
+                s = "Устройству " + i + " не хватило тока";
+            }
+            logs.add(s);
+        }
+        log.setItems(logs);
     }
 }

@@ -177,7 +177,7 @@ public class Circuit {
         return this.I(start, end, I);
     }
 
-    public void Simulate(int start, int end, double emf) {
+    public double[] Simulate(int start, int end, double emf) {
         double[] I = U(start, end, emf);
         double[] res = new double[E]; // 0 - норма, -1 - недостаток, 1 - избыток
 
@@ -194,7 +194,7 @@ public class Circuit {
                 else { res[n] = 0; }
             }
         }
-
-        System.out.println(Arrays.toString(res));
+        return res;
+        // System.out.println(Arrays.toString(res));
     }
 }
