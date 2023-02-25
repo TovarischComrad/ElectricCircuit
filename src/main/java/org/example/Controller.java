@@ -25,14 +25,27 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 public class Controller {
-    Circuit circuit;
+    static Circuit circuit;
+    public Label r_inf;
+    public Label i_inf;
+    public Label u_inf;
     int width;
     int height;
     int margin = 50;
     int cy = (int) (height / 2.0);
 
+    @FXML
+    public Label om;
+    @FXML
+    public Label ampere;
+    @FXML
+    public TextField volt;
+    @FXML
+    public ListView<String> log;
+
+
     // Вспомогательный класс для реализации перемещения объекта
-    public static class Mouse {
+    public class Mouse {
         static Pane pane;
         double orgSceneX, orgSceneY;
         double orgTranslateX, orgTranslateY;
@@ -70,7 +83,37 @@ public class Controller {
                     Circle p = ((Circle) (t.getSource()));
                     orgTranslateX = p.getCenterX();
                     orgTranslateY = p.getCenterY();
-                } else {
+                }
+                else if (t.getSource() instanceof Line) {
+                    Line l = ((Line) (t.getSource()));
+                    String id = l.getId();
+                    double u = Double.parseDouble(volt.getText());
+                    double[] lst = circuit.U(0, circuit.V - 1, u);
+                    String[] idl = id.split(" ");
+                    int k = Integer.parseInt(idl[0]);
+
+                    double i = lst[k];
+                    String I = String.format( "%.2f", i);
+                    i_inf.setText("I = " + I + " А");
+
+                    double r = 0;
+                    int start = Integer.parseInt(idl[1]);
+                    int end = Integer.parseInt(idl[2]);
+                    LinkedList<Edge> lst2 = circuit.AdjList.get(start);
+                    for (Edge edge : lst2) {
+                        if (edge.elementId == end) {
+                            r = edge.electricElement.R;
+                            break;
+                        }
+                    }
+                    String R = String.format( "%.2f", r);
+                    r_inf.setText("R = " + R + " Ом");
+
+                    u = i * r;
+                    String U = String.format( "%.2f", u);
+                    u_inf.setText("U = " + U + " В");
+                }
+                else {
                     Node p = ((Node) (t.getSource()));
                     orgTranslateX = p.getTranslateX();
                     orgTranslateY = p.getTranslateY();
@@ -90,7 +133,11 @@ public class Controller {
                     p.setCenterX(newTranslateX);
                     p.setCenterY(newTranslateY);
                     MoveLine(t, p, (int) pane.getLayoutX(), (int) pane.getLayoutY());
-                } else {
+                }
+                else if (t.getSource() instanceof Line) {
+                    //
+                }
+                else {
                     Node p = ((Node) (t.getSource()));
                     p.setTranslateX(newTranslateX);
                     p.setTranslateY(newTranslateY);
@@ -147,18 +194,21 @@ public class Controller {
             circles.add(circle);
         }
 
+        Mouse mg = new Mouse();
         // Инициализация элементов (рёбер)
         LinkedList<Line> lines = new LinkedList<>();
         for (int i = 0; i < circuit.V; i++) {
             LinkedList<Edge> edges = circuit.AdjList.get(i);
             for (Edge e : edges) {
                 Line line = new Line();
-                String id = "l " + i + " " + e.elementId;
+                String id = e.Id + " " + i + " " + e.elementId;
                 line.setId(id);
+                line.setStrokeWidth(3.0);
                 line.setStartX(circles.get(i).getLayoutX());
                 line.setStartY(circles.get(i).getLayoutY());
                 line.setEndX(circles.get(e.elementId).getLayoutX());
                 line.setEndY(circles.get(e.elementId).getLayoutY());
+                mg.makeDraggable(line);
                 lines.add(line);
             }
         }
@@ -167,14 +217,7 @@ public class Controller {
         Mouse.pane = overlay;
     }
 
-    @FXML
-    private Label om;
-    @FXML
-    public Label ampere;
-    @FXML
-    public TextField volt;
-    @FXML
-    public ListView<String> log;
+
 
     @FXML
     private void Open(ActionEvent event) throws IOException {

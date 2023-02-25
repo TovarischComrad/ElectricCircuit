@@ -35,6 +35,26 @@
          </Label>
          <Button layoutX="313.0" layoutY="14.0" mnemonicParsing="false" onAction="#Simulate" prefHeight="25.0" prefWidth="95.0" text="Запустить" />
          <ListView fx:id="log" layoutX="453.0" layoutY="14.0" prefHeight="176.0" prefWidth="247.0" />
+         <Label layoutX="25.0" layoutY="102.0" text="Информация: ">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <Label fx:id="r_inf" layoutX="27.0" layoutY="123.0" text="R = ... Ом">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label fx:id="i_inf" layoutX="27.0" layoutY="140.0" text="I = ... А">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <Label fx:id="u_inf" layoutX="27.0" layoutY="157.0" text="U = ... В">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
         </Pane>
         <Pane id="overlay" layoutX="47.0" layoutY="241.0" prefHeight="415.0" prefWidth="706.0" />
     </AnchorPane>
