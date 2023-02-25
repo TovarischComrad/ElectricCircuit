@@ -41,12 +41,14 @@ public class Circuit {
         for (int i = 0; i < n; i++) {
             this.AddElement();
         }
-        for (int i = 0; i < V; i++) {
+        while (scanner.hasNextLine()){
             String[] s = scanner.nextLine().split(" ");
             int first = Integer.parseInt(s[0]);
             int second = Integer.parseInt(s[1]);
             double R = Double.parseDouble(s[2]);
-            ElectricElement el = new ElectricElement(R);
+            double I = Double.parseDouble(s[3]);
+            double E = Double.parseDouble(s[4]);
+            ElectricElement el = new ElectricElement(R, I, E);
             this.ConnectElement(first, second, el);
         }
         reader.close();
@@ -195,6 +197,5 @@ public class Circuit {
             }
         }
         return res;
-        // System.out.println(Arrays.toString(res));
     }
 }

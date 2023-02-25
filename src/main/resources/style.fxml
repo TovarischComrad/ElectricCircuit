@@ -6,11 +6,11 @@
 <?import javafx.scene.text.*?>
 
 <Scene xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
-    <AnchorPane id="main" prefHeight="700.0" prefWidth="800.0">
+    <AnchorPane id="main" prefHeight="600.0" prefWidth="800.0">
         <Pane id="control" layoutX="40.0" layoutY="32.0" prefHeight="206.0" prefWidth="720.0">
-            <Button layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onAction="#Open" prefWidth="80.0" text="Open" />
-            <Button layoutX="122.0" layoutY="14.0" mnemonicParsing="false" onAction="#Save" prefWidth="80.0" text="Save" />
-         <Button layoutX="219.0" layoutY="14.0" mnemonicParsing="false" onAction="#Clear" prefWidth="80.0" text="Clear" />
+            <Button layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onAction="#Open" prefWidth="80.0" text="Открыть" />
+            <Button layoutX="122.0" layoutY="14.0" mnemonicParsing="false" onAction="#Save" prefWidth="80.0" text="Сохранить" />
+         <Button layoutX="219.0" layoutY="14.0" mnemonicParsing="false" onAction="#Clear" prefWidth="80.0" text="Очистить" />
          <Button layoutX="25.0" layoutY="50.0" mnemonicParsing="false" onAction="#R" text="R">
             <font>
                <Font size="16.0" />
@@ -21,8 +21,8 @@
                <Font size="15.0" />
             </font>
          </Label>
-         <TextField fx:id="volt" layoutX="275.0" layoutY="55.0" prefHeight="25.0" prefWidth="45.0" text="0" />
-         <Button layoutX="135.0" layoutY="55.0" mnemonicParsing="false" onAction="#U" prefHeight="25.0" prefWidth="130.0" text="Подать напряжение" />
+         <TextField fx:id="volt" layoutX="284.0" layoutY="55.0" prefHeight="25.0" prefWidth="36.0" text="0" />
+         <Button layoutX="148.0" layoutY="55.0" mnemonicParsing="false" onAction="#U" prefHeight="25.0" prefWidth="134.0" text="Подать напряжение" />
          <Label layoutX="326.0" layoutY="57.0" text="В">
             <font>
                <Font size="15.0" />
@@ -33,7 +33,7 @@
                <Font size="15.0" />
             </font>
          </Label>
-         <Button layoutX="313.0" layoutY="14.0" mnemonicParsing="false" onAction="#Simulate" prefHeight="25.0" prefWidth="95.0" text="Запустить" />
+         <Button layoutX="313.0" layoutY="14.0" mnemonicParsing="false" onAction="#Simulate" prefHeight="25.0" prefWidth="95.0" text="Мультиметр" />
          <ListView fx:id="log" layoutX="453.0" layoutY="14.0" prefHeight="176.0" prefWidth="247.0" />
          <Label layoutX="25.0" layoutY="102.0" text="Информация: ">
             <font>
@@ -55,11 +55,14 @@
                <Font size="15.0" />
             </font>
          </Label>
-         <Button layoutX="235.0" layoutY="111.0" mnemonicParsing="false" onAction="#Add" prefHeight="25.0" prefWidth="128.0" text="Добавить узел" />
+         <Button layoutX="277.0" layoutY="111.0" mnemonicParsing="false" onAction="#Add" prefHeight="25.0" prefWidth="106.0" text="Добавить узел" />
          <TextField fx:id="end" layoutX="383.0" layoutY="145.0" prefHeight="25.0" prefWidth="34.0" />
          <TextField fx:id="start" layoutX="348.0" layoutY="145.0" prefHeight="25.0" prefWidth="31.0" />
          <Button layoutX="235.0" layoutY="145.0" mnemonicParsing="false" onAction="#AddEdge" text="Добавить ребро" />
+         <TextField fx:id="r" layoutX="261.0" layoutY="178.0" prefHeight="25.0" prefWidth="42.0" text="1" />
+         <TextField fx:id="i" layoutX="315.0" layoutY="178.0" prefHeight="25.0" prefWidth="40.0" text="1" />
+         <TextField fx:id="eps" layoutX="369.0" layoutY="178.0" prefHeight="25.0" prefWidth="39.0" text="0.5" />
         </Pane>
-        <Pane id="overlay" layoutX="47.0" layoutY="241.0" prefHeight="415.0" prefWidth="706.0" />
+        <Pane id="overlay" layoutX="47.0" layoutY="252.0" prefHeight="289.0" prefWidth="706.0" />
     </AnchorPane>
 </Scene>

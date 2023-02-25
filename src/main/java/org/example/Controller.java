@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -22,20 +23,18 @@ import javafx.scene.control.Label;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Objects;
 
 public class Controller {
     static Circuit circuit;
-    public Label r_inf;
-    public Label i_inf;
-    public Label u_inf;
-    public TextField end;
-    public TextField start;
-    int width;
-    int height;
+    static int width;
+    static int height;
     int margin = 50;
-    int cy = (int) (height / 2.0);
+    static int cx;
+    static int cy;
+    int rad = 7;
 
     @FXML
     public Label om;
@@ -45,6 +44,22 @@ public class Controller {
     public TextField volt;
     @FXML
     public ListView<String> log;
+    @FXML
+    public Label r_inf;
+    @FXML
+    public Label i_inf;
+    @FXML
+    public Label u_inf;
+    @FXML
+    public TextField end;
+    @FXML
+    public TextField start;
+    @FXML
+    public TextField r;
+    @FXML
+    public TextField i;
+    @FXML
+    public TextField eps;
 
 
     // Вспомогательный класс для реализации перемещения объекта
@@ -58,7 +73,7 @@ public class Controller {
             node.setOnMouseDragged(circleOnMouseDraggedEventHandler);
         }
 
-        public void MoveLine(MouseEvent t, Circle c, int x, int y) {
+        public void MoveLine(Circle c, int x, int y) {
             String c_id = c.getId();
             ObservableList<Node> nodes = pane.getChildren();
             for (int i = 0; i < nodes.size(); i++) {
@@ -67,11 +82,11 @@ public class Controller {
                     String l_id = line.getId();
                     String[] ids = l_id.split(" ");
                     if (c_id.equals(ids[1])) {
-                        line.setStartX(t.getSceneX() - x);
-                        line.setStartY(t.getSceneY() - y);
+                        line.setStartX(x + c.getLayoutX());
+                        line.setStartY(y + c.getLayoutY());
                     } else if (c_id.equals(ids[2])) {
-                        line.setEndX(t.getSceneX() - x);
-                        line.setEndY(t.getSceneY() - y);
+                        line.setEndX(x + c.getLayoutX());
+                        line.setEndY(y + c.getLayoutY());
                     }
                 }
             }
@@ -134,7 +149,7 @@ public class Controller {
                     Circle p = ((Circle) (t.getSource()));
                     p.setCenterX(newTranslateX);
                     p.setCenterY(newTranslateY);
-                    MoveLine(t, p, (int) pane.getLayoutX(), (int) pane.getLayoutY());
+                    MoveLine(p, (int) newTranslateX, (int) newTranslateY);
                 }
                 else if (t.getSource() instanceof Line) {
                     //
@@ -158,24 +173,27 @@ public class Controller {
 
         // Расчёт положения вершин
         if (i == 0) {
-            circle.relocate(margin, height / 2.0);
+            circle.setCenterX(margin);
+            circle.setCenterY(cy);
         }
         else if (i == circ.V - 1) {
-            circle.relocate(width - margin, height / 2.0);
+            circle.setCenterX(width - margin);
+            circle.setCenterY(cy);
         }
         else {
             int k = (width - 2 * margin) / (circ.V - 1);
-            int ay = cy - margin * 4;
-            int by = cy + margin * 4;
+            int ay = -margin * 2;
+            int by = margin * 2;
             int x = margin + k * i;
             int y = (int) (Math.random() * (by - ay) + ay);
-            circle.relocate(dx + x, dy + y);
+            circle.setCenterX(dx + x);
+            circle.setCenterY(dy + y);
         }
     }
 
     // Инициализация круга, расчёт положения и назначение действия при нажатии
     public Circle drawCircle(int i, Circuit circ, Event event) {
-        Circle circle = new Circle(5);
+        Circle circle = new Circle(rad);
         circle.setStroke(Color.BLACK);
         circle.setFill(Color.BLACK);
         Location(circle, i, circ, event);
@@ -185,19 +203,17 @@ public class Controller {
     }
 
     public void DrawCircuit(Circuit circuit, Pane overlay, Event event) {
-        width = (int) overlay.getWidth();
-        height = (int) overlay.getHeight();
-
         // Инициализация узлов
         LinkedList<Circle> circles = new LinkedList<>();
         for (int i = 0; i < circuit.V; i++) {
             Circle circle = drawCircle(i, circuit, event);
             circle.setId(String.valueOf(i));
+            Tooltip.install(circle, new Tooltip("Узел №" + i));
             circles.add(circle);
         }
 
-        Mouse mg = new Mouse();
         // Инициализация элементов (рёбер)
+        Mouse mg = new Mouse();
         LinkedList<Line> lines = new LinkedList<>();
         for (int i = 0; i < circuit.V; i++) {
             LinkedList<Edge> edges = circuit.AdjList.get(i);
@@ -206,10 +222,11 @@ public class Controller {
                 String id = e.Id + " " + i + " " + e.elementId;
                 line.setId(id);
                 line.setStrokeWidth(3.0);
-                line.setStartX(circles.get(i).getLayoutX());
-                line.setStartY(circles.get(i).getLayoutY());
-                line.setEndX(circles.get(e.elementId).getLayoutX());
-                line.setEndY(circles.get(e.elementId).getLayoutY());
+                line.setStartX(circles.get(i).getCenterX());
+                line.setStartY(circles.get(i).getCenterY());
+                line.setEndX(circles.get(e.elementId).getCenterX());
+                line.setEndY(circles.get(e.elementId).getCenterY());
+                Tooltip.install(line, new Tooltip("Устройство №" + e.Id));
                 mg.makeDraggable(line);
                 lines.add(line);
             }
@@ -261,13 +278,19 @@ public class Controller {
         volt.setText("0");
         log.getItems().clear();
         circuit = null;
+        start.setText("");
+        end.setText("");
+        r.setText("1");
+        i.setText("1");
+        eps.setText("0.5");
     }
 
     @FXML
     private void R() {
         if (circuit != null) {
             double r = circuit.R(0, circuit.V - 1);
-            String s = "= " + r + " Ом";
+            String R = String.format("%.2f", r);
+            String s = "= " + R + " Ом";
             om.setText(s);
         }
     }
@@ -275,10 +298,19 @@ public class Controller {
     @FXML
     private void U() {
         if (circuit != null) {
-            double u = Double.parseDouble(volt.getText());
+            double u;
+            try {
+                u = Double.parseDouble(volt.getText());
+                if (u < 0) { throw new NumberFormatException(); }
+            }
+            catch (NumberFormatException e) {
+                volt.setText("0");
+                return;
+            }
+
             double r = circuit.R(0, circuit.V - 1);
             double i = u / r;
-            String num = String.format( "%.2f", i);
+            String num = String.format("%.2f", i);
             String s = "I = " + num + " А";
             ampere.setText(s);
         }
@@ -312,48 +344,80 @@ public class Controller {
         }
 
         circuit.AddElement();
-        int i = circuit.V - 1;
-        Circle circle = drawCircle(i, circuit, event);
-        circle.setId(String.valueOf(i));
+        Circle circle = new Circle(rad);
+        circle.setStroke(Color.BLACK);
+        circle.setFill(Color.BLACK);
+        Mouse mg = new Mouse();
+        mg.makeDraggable(circle);
+        circle.setId(String.valueOf(circuit.V - 1));
 
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         Pane overlay = (Pane) scene.lookup("#overlay");
+
+        circle.setCenterX(cx);
+        circle.setCenterY(cy);
+        Tooltip.install(circle, new Tooltip("Узел №" + (circuit.V - 1)));
         overlay.getChildren().addAll(circle);
     }
 
     @FXML
     private void AddEdge(ActionEvent event) {
-        int st = Integer.parseInt(start.getText());
-        int en = Integer.parseInt(end.getText());
-        circuit.ConnectElement(st, en, new ElectricElement());
+        // Проверка ввода
+        int st, en;
+        double R, I, E;
+        try {
+            st = Integer.parseInt(start.getText());
+            en = Integer.parseInt(end.getText());
+            boolean fl = st == en || circuit == null
+                    || st < 0 || st >= circuit.V || en < 0 || en >= circuit.V;
+            if (fl) { throw new NumberFormatException(); }
+            if (en < st) {
+                int tmp = st;
+                st = en;
+                en = tmp;
+            }
+            LinkedList<Edge> lst = circuit.AdjList.get(st);
+            for (Edge e : lst) {
+                if (e.elementId == en) { throw new NumberFormatException(); }
+            }
 
+            R = Double.parseDouble(r.getText());
+            I = Double.parseDouble(i.getText());
+            E = Double.parseDouble(eps.getText());
+            if (R < 0 || I < 0 || E < 0) { throw new NumberFormatException(); }
+        }
+        catch (NumberFormatException e) {
+            start.setText("");
+            end.setText("");
+            r.setText("1");
+            i.setText("1");
+            eps.setText("0.5");
+            return;
+        }
+
+        circuit.ConnectElement(st, en, new ElectricElement(R, I, E));
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         Pane overlay = (Pane) scene.lookup("#overlay");
 
-        Circle circle1 = new Circle();
-        Circle circle2 = new Circle();
-        ObservableList<Node> lst = overlay.getChildren();
-        for (Node value : lst) {
-            if (Objects.equals(value.getId(), String.valueOf(st))) {
-                circle1 = (Circle) value;
-            }
-            if (Objects.equals(value.getId(), String.valueOf(en))) {
-                circle2 = (Circle) value;
-            }
-        }
+        Circle circle1 = (Circle) overlay.lookup("#" + st);
+        Circle circle2 = (Circle) overlay.lookup("#" + en);
 
         Mouse mg = new Mouse();
         Line line = new Line();
         String id = circuit.E - 1 + " " + st + " " + en;
         line.setId(id);
         line.setStrokeWidth(3.0);
-        line.setStartX(circle1.getLayoutX());
-        line.setStartY(circle1.getLayoutY());
-        line.setEndX(circle2.getLayoutX());
-        line.setEndY(circle2.getLayoutY());
+        line.setStartX(circle1.getCenterX());
+        line.setStartY(circle1.getCenterY());
+        line.setEndX(circle2.getCenterX());
+        line.setEndY(circle2.getCenterY());
+        Tooltip.install(line, new Tooltip("Устройство №" + (circuit.E - 1)));
         mg.makeDraggable(line);
         overlay.getChildren().addAll(line);
+
+        start.setText("");
+        end.setText("");
     }
 }
