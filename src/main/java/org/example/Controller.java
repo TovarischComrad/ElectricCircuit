@@ -23,12 +23,15 @@ import javafx.scene.control.Label;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Objects;
 
 public class Controller {
     static Circuit circuit;
     public Label r_inf;
     public Label i_inf;
     public Label u_inf;
+    public TextField end;
+    public TextField start;
     int width;
     int height;
     int margin = 50;
@@ -120,7 +123,6 @@ public class Controller {
                 }
             }
         };
-
         EventHandler<MouseEvent> circleOnMouseDraggedEventHandler = new EventHandler<>() {
             @Override
             public void handle(MouseEvent t) {
@@ -217,8 +219,6 @@ public class Controller {
         Mouse.pane = overlay;
     }
 
-
-
     @FXML
     private void Open(ActionEvent event) throws IOException {
         Node node = (Node) event.getSource();
@@ -303,5 +303,57 @@ public class Controller {
             logs.add(s);
         }
         log.setItems(logs);
+    }
+
+    @FXML
+    private void Add(ActionEvent event) {
+        if (circuit == null) {
+            circuit = new Circuit();
+        }
+
+        circuit.AddElement();
+        int i = circuit.V - 1;
+        Circle circle = drawCircle(i, circuit, event);
+        circle.setId(String.valueOf(i));
+
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        Pane overlay = (Pane) scene.lookup("#overlay");
+        overlay.getChildren().addAll(circle);
+    }
+
+    @FXML
+    private void AddEdge(ActionEvent event) {
+        int st = Integer.parseInt(start.getText());
+        int en = Integer.parseInt(end.getText());
+        circuit.ConnectElement(st, en, new ElectricElement());
+
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        Pane overlay = (Pane) scene.lookup("#overlay");
+
+        Circle circle1 = new Circle();
+        Circle circle2 = new Circle();
+        ObservableList<Node> lst = overlay.getChildren();
+        for (Node value : lst) {
+            if (Objects.equals(value.getId(), String.valueOf(st))) {
+                circle1 = (Circle) value;
+            }
+            if (Objects.equals(value.getId(), String.valueOf(en))) {
+                circle2 = (Circle) value;
+            }
+        }
+
+        Mouse mg = new Mouse();
+        Line line = new Line();
+        String id = circuit.E - 1 + " " + st + " " + en;
+        line.setId(id);
+        line.setStrokeWidth(3.0);
+        line.setStartX(circle1.getLayoutX());
+        line.setStartY(circle1.getLayoutY());
+        line.setEndX(circle2.getLayoutX());
+        line.setEndY(circle2.getLayoutY());
+        mg.makeDraggable(line);
+        overlay.getChildren().addAll(line);
     }
 }

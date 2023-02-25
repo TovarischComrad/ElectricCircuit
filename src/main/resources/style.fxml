@@ -55,6 +55,10 @@
                <Font size="15.0" />
             </font>
          </Label>
+         <Button layoutX="235.0" layoutY="111.0" mnemonicParsing="false" onAction="#Add" prefHeight="25.0" prefWidth="128.0" text="Добавить узел" />
+         <TextField fx:id="end" layoutX="383.0" layoutY="145.0" prefHeight="25.0" prefWidth="34.0" />
+         <TextField fx:id="start" layoutX="348.0" layoutY="145.0" prefHeight="25.0" prefWidth="31.0" />
+         <Button layoutX="235.0" layoutY="145.0" mnemonicParsing="false" onAction="#AddEdge" text="Добавить ребро" />
         </Pane>
         <Pane id="overlay" layoutX="47.0" layoutY="241.0" prefHeight="415.0" prefWidth="706.0" />
     </AnchorPane>
