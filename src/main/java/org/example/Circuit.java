@@ -7,15 +7,14 @@ import java.io.IOException;
 import java.util.*;
 
 
-// TODO - разобраться с int и Integer
 public class Circuit {
 
     static int MaxId = 0;
 
     // Вершина - соединяющий узел
-    LinkedList<Integer> VertexList;
+    final LinkedList<Integer> VertexList;
     // Ребро - электрический элемент
-    HashMap<Integer, LinkedList<Edge>> AdjList;
+    final HashMap<Integer, LinkedList<Edge>> AdjList;
     int V;
     int E;
 
@@ -27,7 +26,6 @@ public class Circuit {
         AdjList = new HashMap<>();
     }
 
-    // TODO - возможно добавить тип элемента (лампочка, резистор, реостат, ...)
     // Считывание схемы из файла
     public Circuit(String filePath) throws IOException {
         MaxId = 0;
@@ -73,7 +71,9 @@ public class Circuit {
             String first = lst.get(i).getKey().toString();
             String second = String.valueOf(lst.get(i).getValue().elementId);
             String R = String.valueOf(lst.get(i).getValue().electricElement.R);
-            writer.write(first + " " + second + " " + R + "\n");
+            String I = String.valueOf(lst.get(i).getValue().electricElement.I);
+            String E = String.valueOf(lst.get(i).getValue().electricElement.eps);
+            writer.write(first + " " + second + " " + R + " " + I + " " + E + "\n");
         }
         writer.close();
 

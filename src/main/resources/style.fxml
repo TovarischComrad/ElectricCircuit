@@ -6,7 +6,7 @@
 <?import javafx.scene.text.*?>
 
 <Scene xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
-    <AnchorPane id="main" prefHeight="600.0" prefWidth="800.0">
+    <AnchorPane id="main" onMouseClicked="#ClearLines" prefHeight="600.0" prefWidth="800.0">
         <Pane id="control" layoutX="40.0" layoutY="32.0" prefHeight="206.0" prefWidth="720.0">
             <Button layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onAction="#Open" prefWidth="80.0" text="Открыть" />
             <Button layoutX="122.0" layoutY="14.0" mnemonicParsing="false" onAction="#Save" prefWidth="80.0" text="Сохранить" />

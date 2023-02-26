@@ -19,22 +19,18 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
-
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Objects;
 
 public class Controller {
     static Circuit circuit;
     static int width;
     static int height;
-    int margin = 50;
+    final int margin = 50;
     static int cx;
     static int cy;
-    int rad = 7;
+    final int rad = 7;
 
     @FXML
     public Label om;
@@ -62,11 +58,22 @@ public class Controller {
     public TextField eps;
 
 
+
+
     // Вспомогательный класс для реализации перемещения объекта
     public class Mouse {
         static Pane pane;
         double orgSceneX, orgSceneY;
         double orgTranslateX, orgTranslateY;
+
+        public void PaintLines() {
+            ObservableList<Node> lst = pane.getChildren();
+            for (Node el : lst) {
+                if (el instanceof Line) {
+                    ((Line) el).setStroke(Color.BLACK);
+                }
+            }
+        }
 
         public void makeDraggable(Node node) {
             node.setOnMousePressed(circleOnMousePressedEventHandler);
@@ -92,7 +99,7 @@ public class Controller {
             }
         }
 
-        EventHandler<MouseEvent> circleOnMousePressedEventHandler = new EventHandler<>() {
+        final EventHandler<MouseEvent> circleOnMousePressedEventHandler = new EventHandler<>() {
             @Override
             public void handle(MouseEvent t) {
                 orgSceneX = t.getSceneX();
@@ -130,6 +137,9 @@ public class Controller {
                     u = i * r;
                     String U = String.format( "%.2f", u);
                     u_inf.setText("U = " + U + " В");
+
+                    PaintLines();
+                    l.setStroke(Color.RED);
                 }
                 else {
                     Node p = ((Node) (t.getSource()));
@@ -138,7 +148,7 @@ public class Controller {
                 }
             }
         };
-        EventHandler<MouseEvent> circleOnMouseDraggedEventHandler = new EventHandler<>() {
+        final EventHandler<MouseEvent> circleOnMouseDraggedEventHandler = new EventHandler<>() {
             @Override
             public void handle(MouseEvent t) {
                 double offsetX = t.getSceneX() - orgSceneX;
@@ -151,13 +161,12 @@ public class Controller {
                     p.setCenterY(newTranslateY);
                     MoveLine(p, (int) newTranslateX, (int) newTranslateY);
                 }
-                else if (t.getSource() instanceof Line) {
-                    //
-                }
                 else {
-                    Node p = ((Node) (t.getSource()));
-                    p.setTranslateX(newTranslateX);
-                    p.setTranslateY(newTranslateY);
+                    if (!(t.getSource() instanceof Line)) {
+                        Node p = ((Node) (t.getSource()));
+                        p.setTranslateX(newTranslateX);
+                        p.setTranslateY(newTranslateY);
+                    }
                 }
             }
         };
@@ -226,7 +235,10 @@ public class Controller {
                 line.setStartY(circles.get(i).getCenterY());
                 line.setEndX(circles.get(e.elementId).getCenterX());
                 line.setEndY(circles.get(e.elementId).getCenterY());
-                Tooltip.install(line, new Tooltip("Устройство №" + e.Id));
+                String s = "Устройство №" + e.Id + "\n"
+                        + "Сила тока " + e.electricElement.I + "А\n"
+                        + "Допустимое отклонение " + e.electricElement.eps + "А\n";
+                Tooltip.install(line, new Tooltip(s));
                 mg.makeDraggable(line);
                 lines.add(line);
             }
@@ -278,6 +290,8 @@ public class Controller {
         volt.setText("0");
         log.getItems().clear();
         circuit = null;
+        Circuit.MaxId = 0;
+        Edge.MaxId = 0;
         start.setText("");
         end.setText("");
         r.setText("1");
@@ -396,13 +410,16 @@ public class Controller {
             return;
         }
 
-        circuit.ConnectElement(st, en, new ElectricElement(R, I, E));
+        ElectricElement el = new ElectricElement(R, I, E);
+        circuit.ConnectElement(st, en, el);
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         Pane overlay = (Pane) scene.lookup("#overlay");
 
         Circle circle1 = (Circle) overlay.lookup("#" + st);
         Circle circle2 = (Circle) overlay.lookup("#" + en);
+        overlay.getChildren().remove(circle1);
+        overlay.getChildren().remove(circle2);
 
         Mouse mg = new Mouse();
         Line line = new Line();
@@ -413,11 +430,23 @@ public class Controller {
         line.setStartY(circle1.getCenterY());
         line.setEndX(circle2.getCenterX());
         line.setEndY(circle2.getCenterY());
-        Tooltip.install(line, new Tooltip("Устройство №" + (circuit.E - 1)));
+        String s = "Устройство №" + (circuit.E - 1) + "\n"
+                + "Сила тока " + el.I + "А\n"
+                + "Допустимое отклонение " + el.eps + "А\n";
+        Tooltip.install(line, new Tooltip(s));
         mg.makeDraggable(line);
-        overlay.getChildren().addAll(line);
+        overlay.getChildren().addAll(line, circle1, circle2);
 
         start.setText("");
         end.setText("");
+    }
+
+    @FXML
+    public void ClearLines() {
+        Mouse mg = new Mouse();
+        mg.PaintLines();
+        r_inf.setText("R = ... Ом");
+        i_inf.setText("I = ... А");
+        u_inf.setText("U = ... В");
     }
 }
